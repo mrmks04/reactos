@@ -2,7 +2,7 @@
  * PROJECT:     ReactOS WdfLdr driver
  * LICENSE:     GPL-2.0-or-later (https://spdx.org/licenses/GPL-2.0-or-later)
  * PURPOSE:     WdfLdr driver - class functions
- * COPYRIGHT:   Copyright 2019 mrmks04 (mrmks04@yandex.ru)
+ * COPYRIGHT:   Copyright 2019 Max Korostil (mrmks04@yandex.ru)
  */
 
 
