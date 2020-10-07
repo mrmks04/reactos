@@ -45,6 +45,7 @@ WdfLdrUnload(
 }
 
 NTSTATUS
+NTAPI
 DriverEntry(
     _In_ PDRIVER_OBJECT DriverObject,
     _In_ PUNICODE_STRING RegistryPath)
@@ -61,7 +62,7 @@ WdfLdrOpenRegistryDiagnosticsHandle(
 {
     NTSTATUS status;
     OBJECT_ATTRIBUTES ObjectAttributes;
-    UNICODE_STRING registryPath = RTL_CONSTANT_STRING(L"\\Registry\\Machine\\System\\CurrentControlSet\\Control\\Wdf\\Kmdf\\Diagnostics");
+    static UNICODE_STRING registryPath = RTL_CONSTANT_STRING(L"\\Registry\\Machine\\System\\CurrentControlSet\\Control\\Wdf\\Kmdf\\Diagnostics");
 
     ObjectAttributes.RootDirectory = 0;
     ObjectAttributes.SecurityDescriptor = 0;
@@ -236,7 +237,7 @@ LibraryUnloadClasses(
         __DBGPRINT(("Unload class library %wZ (%p)\n", &pClassModule->Service, pClassModule));
 
         ClassUnload(pClassModule, 0);
-        if (!_InterlockedExchangeAdd(&pClassModule->ClassRefCount, -1))
+        if (!InterlockedExchangeAdd(&pClassModule->ClassRefCount, -1))
             ClassCleanupAndFree(pClassModule);
     }
     
@@ -296,7 +297,7 @@ DllUnload()
         LibraryUnloadClasses(pLibModule);
         LibraryUnload(pLibModule, 0);
 
-        if (!_InterlockedExchangeAdd(&pLibModule->LibraryRefCount, -1))
+        if (!InterlockedExchangeAdd(&pLibModule->LibraryRefCount, -1))
             LibraryCleanupAndFree(pLibModule);
     }
 
@@ -356,7 +357,7 @@ WdfLdrQueryInterface(
             pLdrInterfaceClass = (PWDF_LOADER_INTERFACE_CLASS_BIND)LoaderInterface;
             pLdrInterfaceClass->ClassBind = WdfVersionBindClass;
             pLdrInterfaceClass->ClassUnbind = WdfVersionUnbindClass;
-            
+
             return STATUS_SUCCESS;
         }
     }
@@ -606,7 +607,7 @@ GetDefaultServiceName(
 {
     PWCHAR buffer;
     NTSTATUS status;
-    PUNICODE_STRING defaultServiceName;
+    PUNICODE_STRING defaultServiceName = RegistryPath;
 
     buffer = ExAllocatePoolWithTag(PagedPool, 120, WDFLDR_TAG);
     
@@ -617,12 +618,10 @@ GetDefaultServiceName(
         goto exit;
     }
 
-    defaultServiceName = RegistryPath;
-    RegistryPath->Length = 0;
-    RegistryPath->Buffer = NULL;
     RegistryPath->Length = 0;
     RegistryPath->MaximumLength = 120;
     RegistryPath->Buffer = buffer;
+
     status = RtlUnicodeStringPrintf(RegistryPath,
         L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\Wdf%02d000",
         BindInfo->Version.Major);
@@ -636,7 +635,7 @@ GetDefaultServiceName(
     {
         __DBGPRINT(("ERROR: RtlUnicodeStringCopyString failed with Status 0x%x\n", status));
         
-        ExFreePoolWithTag(buffer, 0);
+        ExFreePoolWithTag(buffer, WDFLDR_TAG);
         defaultServiceName->Length = 0;
         defaultServiceName->Buffer = NULL;
     }
@@ -706,7 +705,7 @@ GetVersionServicePath(
     if (handleRegKey != NULL)
         ZwClose(handleRegKey);
     if (pKeyVal != NULL)
-        ExFreePoolWithTag(pKeyVal, 0);
+        ExFreePoolWithTag(pKeyVal, WDFLDR_TAG);
 
     return status;
 }
@@ -750,7 +749,7 @@ ReferenceVersion(
     // if module finded, increment reference
     if (pLibModule != NULL)
     {
-        _InterlockedExchangeAdd(&pLibModule->LibraryRefCount, 1);
+        InterlockedExchangeAdd(&pLibModule->LibraryRefCount, 1);
     }
     else
     {
@@ -758,7 +757,7 @@ ReferenceVersion(
         pLibModule = LibraryCreate(0, &driverServiceName);
         if (pLibModule != NULL)
         {
-            _InterlockedExchangeAdd(&pLibModule->LibraryRefCount, 1);
+            InterlockedExchangeAdd(&pLibModule->LibraryRefCount, 1);
             LibraryAddToLibraryListLocked(pLibModule);
             newCreated = TRUE;
         }
@@ -799,7 +798,7 @@ ReferenceVersion(
     }
     
     if (pLibModule != NULL &&
-        _InterlockedExchangeAdd(&pLibModule->LibraryRefCount, -1) == 0)
+        InterlockedExchangeAdd(&pLibModule->LibraryRefCount, -1) == 0)
     {
         LibraryCleanupAndFree(pLibModule);
     }
@@ -873,7 +872,7 @@ WdfVersionBind(
         goto clean;
     }
 
-    _InterlockedExchangeAdd(&pLibModule->ClientRefCount, 1);
+    InterlockedExchangeAdd(&pLibModule->ClientRefCount, 1);
     status = LibraryLinkInClient(BindInfo->Module, RegistryPath, BindInfo, &clientInfo, &pClientModule);
 
     if (!NT_SUCCESS(status))
@@ -944,11 +943,11 @@ WdfVersionBindClass(
 
     if (!NT_SUCCESS(status))
     {
-        ExFreePoolWithTag(pClassClientModule, 0);
+        ExFreePoolWithTag(pClassClientModule, WDFLDR_TAG);
         return status;
     }
     
-    _InterlockedExchangeAdd(&pClassModule->ClientRefCount, 1);
+    InterlockedExchangeAdd(&pClassModule->ClientRefCount, 1);
     status = ClassLinkInClient(pClassModule, ClassBindInfo, BindInfo, pClassClientModule);
     
     if (!NT_SUCCESS(status))
@@ -970,7 +969,7 @@ end:
     if (pClassModule != NULL)
         WdfVersionUnbindClass(BindInfo, Globals, ClassBindInfo);
     if (pClassClientModule != NULL)
-        ExFreePoolWithTag(pClassClientModule, 0);
+        ExFreePoolWithTag(pClassClientModule, WDFLDR_TAG);
 
     __DBGPRINT(("Returning with Status 0x%x\n", status));
 

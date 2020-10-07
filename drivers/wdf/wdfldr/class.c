@@ -467,7 +467,7 @@ GetClassServicePath(
     if (Handle)
         ZwClose(Handle);
     if (pKeyValPartial)
-        ExFreePoolWithTag(pKeyValPartial, 0);
+        ExFreePoolWithTag(pKeyValPartial, WDFLDR_TAG);
 
     return status;
 }

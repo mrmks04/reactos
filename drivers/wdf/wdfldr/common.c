@@ -11,6 +11,8 @@
 
 #include <ntintsafe.h>
 #include <ntstrsafe.h>
+#include <ntifs.h>
+#include <ndk/ntndk.h>
 
 
 NTSTATUS
@@ -183,7 +185,7 @@ end:
     }
     if (pKeyValPartial) 
     {
-        ExFreePoolWithTag(pKeyValPartial, 0);
+        ExFreePoolWithTag(pKeyValPartial, WDFLDR_TAG);
     }
 
     return status;

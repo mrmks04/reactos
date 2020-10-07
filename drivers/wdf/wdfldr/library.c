@@ -233,7 +233,7 @@ LibraryRemoveFromLibraryList(
     FxLdrReleaseLoadedModuleLock();
     if (removed)
     {
-        if (!_InterlockedExchangeAdd(&LibModule->LibraryRefCount, -1))
+        if (!InterlockedExchangeAdd(&LibModule->LibraryRefCount, -1))
             LibraryCleanupAndFree(LibModule);
     }
 }
@@ -284,18 +284,17 @@ LibraryLinkInClient(
     NTSTATUS status;
 
     *ClientModule = NULL;
-    pClientModule = ExAllocatePoolWithTag(NonPagedPool, sizeof(CLIENT_MODULE), WDFLDR_TAG);
+    pClientModule = ExAllocatePoolZero(NonPagedPool, sizeof(CLIENT_MODULE), WDFLDR_TAG);
 
     if (pClientModule == NULL)
     {
         status = STATUS_INSUFFICIENT_RESOURCES;        
 
-        __DBGPRINT(("ERROR: ExAllocatePoolWithTag failed with Status 0x%x\n", status));
+        __DBGPRINT(("ERROR: ExAllocatePoolZero failed with Status 0x%x\n", status));
 
         goto error;
     }
 
-    RtlZeroMemory(pClientModule, sizeof(CLIENT_MODULE));
     InitializeListHead(&pClientModule->ClassListHead);
     InitializeListHead(&pClientModule->LibListEntry);
     pClientModule->Context = Context;
