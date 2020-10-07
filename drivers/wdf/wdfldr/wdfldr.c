@@ -311,42 +311,52 @@ clean:
 NTSTATUS
 NTAPI
 WdfLdrQueryInterface(
-    _In_ PWDF_LOADER_INTERFACE LoaderInterface)
+    _In_ PWDF_INTERFACE_HEADER LoaderInterface)
 {
-    if (LoaderInterface == NULL || LoaderInterface->Header.InterfaceType == NULL)
+    PWDF_LOADER_INTERFACE pLdrInterface = NULL;
+    PWDF_LOADER_INTERFACE_DIAGNOSTIC pLdrInterfaceDiagn = NULL;
+    PWDF_LOADER_INTERFACE_CLASS_BIND pLdrInterfaceClass = NULL;
+
+    if (LoaderInterface == NULL || LoaderInterface->InterfaceType == NULL)
     {
         return STATUS_INVALID_PARAMETER;
     }
 
-    if (RtlCompareMemory(LoaderInterface->Header.InterfaceType, &GUID_WDF_LOADER_INTERFACE_STANDARD, 0x10u) == 16)
+    if (RtlCompareMemory(LoaderInterface->InterfaceType, &GUID_WDF_LOADER_INTERFACE_STANDARD, sizeof(GUID)) == sizeof(GUID))
     {
-        if (LoaderInterface->Header.InterfaceSize == 24)
+        if (LoaderInterface->InterfaceSize == sizeof(WDF_INTERFACE_HEADER))
         {
+            pLdrInterface = (PWDF_LOADER_INTERFACE)LoaderInterface;
             // fill interface functions addresses
-            LoaderInterface->RegisterLibrary = (int(__stdcall*)(PWDF_LIBRARY_INFO, PUNICODE_STRING, PUNICODE_STRING))WdfRegisterLibrary;
-            LoaderInterface->VersionBind = (int(__stdcall*)(PDRIVER_OBJECT, PUNICODE_STRING, PWDF_BIND_INFO, void***))WdfVersionBind;
-            LoaderInterface->VersionUnbind = WdfVersionUnbind;
-            LoaderInterface->DiagnosticsValueByNameAsULONG = WdfLdrDiagnosticsValueByNameAsULONG;
+            pLdrInterface->RegisterLibrary = WdfRegisterLibrary;
+            pLdrInterface->VersionBind = WdfVersionBind;
+            pLdrInterface->VersionUnbind = WdfVersionUnbind;
+            pLdrInterface->DiagnosticsValueByNameAsULONG = WdfLdrDiagnosticsValueByNameAsULONG;
+
             return STATUS_SUCCESS;
         }
     }
-    else if (RtlCompareMemory(LoaderInterface->Header.InterfaceType, &GUID_WDF_LOADER_INTERFACE_DIAGNOSTIC, 0x10u) == 16)
+    else if (RtlCompareMemory(LoaderInterface->InterfaceType, &GUID_WDF_LOADER_INTERFACE_DIAGNOSTIC, sizeof(GUID)) == sizeof(GUID))
     {
-        if (LoaderInterface->Header.InterfaceSize == 12)
+        if (LoaderInterface->InterfaceSize == sizeof(WDF_LOADER_INTERFACE_DIAGNOSTIC))
         {
-            LoaderInterface->RegisterLibrary = (int(__stdcall*)(PWDF_LIBRARY_INFO, PUNICODE_STRING, PUNICODE_STRING))WdfLdrDiagnosticsValueByNameAsULONG;
+            pLdrInterfaceDiagn = (PWDF_LOADER_INTERFACE_DIAGNOSTIC)LoaderInterface;
+            pLdrInterfaceDiagn->DiagnosticsValueByNameAsULONG = WdfLdrDiagnosticsValueByNameAsULONG;
+
             return STATUS_SUCCESS;
         }
     }
     else
     {
-        if (RtlCompareMemory(LoaderInterface->Header.InterfaceType, &GUID_WDF_LOADER_INTERFACE_CLASS_BIND, 0x10u) != 16)
+        if (RtlCompareMemory(LoaderInterface->InterfaceType, &GUID_WDF_LOADER_INTERFACE_CLASS_BIND, sizeof(GUID)) != sizeof(GUID))
             return STATUS_NOINTERFACE;
     
-        if (LoaderInterface->Header.InterfaceSize == 16)
+        if (LoaderInterface->InterfaceSize == sizeof(WDF_LOADER_INTERFACE_CLASS_BIND))
         {
-            LoaderInterface->RegisterLibrary = (int(__stdcall*)(PWDF_LIBRARY_INFO, PUNICODE_STRING, PUNICODE_STRING))WdfVersionBindClass;
-            LoaderInterface->VersionBind = (int(__stdcall*)(PDRIVER_OBJECT, PUNICODE_STRING, PWDF_BIND_INFO, void***))WdfVersionUnbindClass;
+            pLdrInterfaceClass = (PWDF_LOADER_INTERFACE_CLASS_BIND)LoaderInterface;
+            pLdrInterfaceClass->ClassBind = WdfVersionBindClass;
+            pLdrInterfaceClass->ClassUnbind = WdfVersionUnbindClass;
+            
             return STATUS_SUCCESS;
         }
     }

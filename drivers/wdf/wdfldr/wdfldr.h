@@ -78,4 +78,4 @@ WdfVersionUnbindClass(
 NTSTATUS
 NTAPI
 WdfLdrQueryInterface(
-    _In_ PWDF_LOADER_INTERFACE LoaderInterface);
+    _In_ PWDF_INTERFACE_HEADER LoaderInterface);

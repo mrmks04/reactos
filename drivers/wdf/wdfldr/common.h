@@ -102,6 +102,50 @@ typedef struct _LIBRARY_MODULE {
 } LIBRARY_MODULE, *PLIBRARY_MODULE;
 
 
+typedef
+_Must_inspect_result_
+NTSTATUS
+(NTAPI *PWDF_REGISTER_LIBRARY)(
+    PWDF_LIBRARY_INFO   LibraryInfo,
+    PUNICODE_STRING     ServicePath,
+    PUNICODE_STRING    LibraryDeviceName);
+
+typedef
+_Must_inspect_result_
+NTSTATUS
+(NTAPI *PWDF_VERSION_BIND)(
+    PDRIVER_OBJECT           DriverObject,
+    PUNICODE_STRING          RegistryPath,
+    PWDF_BIND_INFO           Info,
+    PWDF_COMPONENT_GLOBALS * Globals);
+
+typedef
+NTSTATUS
+(NTAPI *PWDF_VERSION_UNBIND)(
+    PUNICODE_STRING         RegistryPath,
+    PWDF_BIND_INFO          Info,
+    PWDF_COMPONENT_GLOBALS  Globals);
+
+typedef
+NTSTATUS
+(NTAPI *PWDF_LDR_DIAGNOSTICS_VALUE_BY_NAME_AS_ULONG)(
+    PUNICODE_STRING ValueName,
+    PULONG          Value);
+
+typedef
+NTSTATUS
+(NTAPI *PWDF_CLASS_BIND)(
+    PWDF_BIND_INFO BindInfo,
+    PWDF_COMPONENT_GLOBALS Globals,
+    PWDF_CLASS_BIND_INFO ClassBindInfo);
+
+typedef
+VOID
+(NTAPI *PWDF_CLASS_UNBIND)(
+    PWDF_BIND_INFO BindInfo,
+    PWDF_COMPONENT_GLOBALS Globals,
+    PWDF_CLASS_BIND_INFO ClassBindInfo);
+
 typedef struct _WDF_BIND_INFO {
     ULONG           Size;
     wchar_t* Component;
@@ -114,11 +158,22 @@ typedef struct _WDF_BIND_INFO {
 
 typedef struct _WDF_LOADER_INTERFACE {
     WDF_INTERFACE_HEADER Header;
-    int(__stdcall* RegisterLibrary)(PWDF_LIBRARY_INFO, PUNICODE_STRING, PUNICODE_STRING);
-    int(__stdcall* VersionBind)(PDRIVER_OBJECT, PUNICODE_STRING, PWDF_BIND_INFO, void***);
-    NTSTATUS(__stdcall* VersionUnbind)(PUNICODE_STRING, PWDF_BIND_INFO, PWDF_COMPONENT_GLOBALS);
-    NTSTATUS(__stdcall* DiagnosticsValueByNameAsULONG)(PUNICODE_STRING, PULONG);
+    PWDF_REGISTER_LIBRARY RegisterLibrary;
+    PWDF_VERSION_BIND VersionBind;
+    PWDF_VERSION_UNBIND VersionUnbind;
+    PWDF_LDR_DIAGNOSTICS_VALUE_BY_NAME_AS_ULONG DiagnosticsValueByNameAsULONG;
 } WDF_LOADER_INTERFACE, *PWDF_LOADER_INTERFACE;
+
+typedef struct _WDF_LOADER_INTERFACE_DIAGNOSTIC {
+    WDF_INTERFACE_HEADER Header;
+    PWDF_LDR_DIAGNOSTICS_VALUE_BY_NAME_AS_ULONG DiagnosticsValueByNameAsULONG;
+} WDF_LOADER_INTERFACE_DIAGNOSTIC, *PWDF_LOADER_INTERFACE_DIAGNOSTIC;
+
+typedef struct _WDF_LOADER_INTERFACE_CLASS_BIND {
+    WDF_INTERFACE_HEADER Header;
+    PWDF_CLASS_BIND ClassBind;
+    PWDF_CLASS_UNBIND ClassUnbind;
+} WDF_LOADER_INTERFACE_CLASS_BIND, *PWDF_LOADER_INTERFACE_CLASS_BIND;
 
 
 typedef struct _CLIENT_MODULE {
