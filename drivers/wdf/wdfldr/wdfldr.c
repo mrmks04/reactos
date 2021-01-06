@@ -28,12 +28,12 @@ BOOLEAN gUnloaded;
 OSVERSIONINFOW gOsVersionInfoW;
 //===== Global vars =====//
 
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text (PAGE, WdfRegisterLibrary)
-#pragma alloc_text (PAGE, WdfVersionBind)
-#pragma alloc_text (PAGE, WdfVersionUnbind)
-#pragma alloc_text (PAGE, WdfRegisterClassLibrary)
-#endif
+// #ifdef ALLOC_PRAGMA
+// #pragma alloc_text (PAGE, WdfRegisterLibrary)
+// #pragma alloc_text (PAGE, WdfVersionBind)
+// #pragma alloc_text (PAGE, WdfVersionUnbind)
+// #pragma alloc_text (PAGE, WdfRegisterClassLibrary)
+// #endif
 
 VOID
 NTAPI
@@ -433,7 +433,7 @@ NTAPI
 WdfRegisterLibrary(
     _In_ PWDF_LIBRARY_INFO LibraryInfo,
     _In_ PUNICODE_STRING ServicePath,
-    _In_ PUNICODE_STRING LibraryDeviceName)
+    _In_ PCUNICODE_STRING LibraryDeviceName)
 {
     NTSTATUS status;
     PLIBRARY_MODULE pLibModule;

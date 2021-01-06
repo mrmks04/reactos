@@ -10,13 +10,21 @@
 
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef ULONG WDF_MAJOR_VERSION;
+typedef ULONG WDF_MINOR_VERSION;
+typedef ULONG WDF_BUILD_NUMBER;
+
 
 NTSTATUS
 NTAPI
 WdfRegisterLibrary(
     _In_ PWDF_LIBRARY_INFO LibraryInfo,
     _In_ PUNICODE_STRING ServicePath,
-    _In_ PUNICODE_STRING LibraryDeviceName
+    _In_ PCUNICODE_STRING LibraryDeviceName
 );
 
 NTSTATUS
@@ -79,3 +87,7 @@ NTSTATUS
 NTAPI
 WdfLdrQueryInterface(
     _In_ PWDF_INTERFACE_HEADER LoaderInterface);
+
+#ifdef __cplusplus
+}
+#endif

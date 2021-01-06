@@ -32,10 +32,14 @@ if(CLANG)
     target_compile_options(cdrom PRIVATE -Wno-enum-conversion -Wno-tautological-constant-compare)
 endif()
 
-target_compile_definitions(cdrom PRIVATE DEBUG_USE_KDPRINT)
+target_compile_definitions(cdrom PRIVATE DEBUG_USE_KDPRINT 
+    WDF_DEVICE_NO_WDMSEC_H _WIN32_WINNT=0x603 NTDDI_VERSION=0x06030000)
+
+target_include_directories(cdrom PUBLIC
+    ${REACTOS_SOURCE_DIR}/sdk/include/wdf/kmdf/1.17)
 
 target_link_libraries(cdrom wdf01000 ntoskrnl_vista libcntpr ${PSEH_LIB})
-add_importlibs(cdrom ntoskrnl hal)
+add_importlibs(cdrom wdfldr ntoskrnl hal)
 # add_pch(cdrom cdrom.h SOURCE)
 add_cd_file(TARGET cdrom DESTINATION reactos/system32/drivers NO_CAB FOR all)
 add_registry_inf(cdrom_reg.inf)

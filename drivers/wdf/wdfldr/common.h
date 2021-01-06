@@ -25,7 +25,7 @@ PRtlQueryModuleInformation pfnRtlQueryModuleInformation;
 #define WDFLDR_TAG 'LfdW'
 
 #define __PrintUnfiltered(...)          \
-    DbgPrint(__VA_ARGS__);
+    DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_ERROR_LEVEL, __VA_ARGS__);
 
 #define __DBGPRINT(_x_)                                                           \
 {                                                                              \
@@ -36,7 +36,7 @@ PRtlQueryModuleInformation pfnRtlQueryModuleInformation;
 }
 
 typedef struct _WDF_INTERFACE_HEADER {
-    PGUID InterfaceType;
+    const GUID *InterfaceType;
     ULONG InterfaceSize;
 } WDF_INTERFACE_HEADER, *PWDF_INTERFACE_HEADER;
 
@@ -108,7 +108,7 @@ NTSTATUS
 (NTAPI *PWDF_REGISTER_LIBRARY)(
     PWDF_LIBRARY_INFO   LibraryInfo,
     PUNICODE_STRING     ServicePath,
-    PUNICODE_STRING    LibraryDeviceName);
+    PCUNICODE_STRING    LibraryDeviceName);
 
 typedef
 _Must_inspect_result_
@@ -256,7 +256,7 @@ typedef struct _CLIENT_INFO {
 
 NTSTATUS
 NTAPI
-GetImageName(
+GetImageName2(
     _In_ PUNICODE_STRING DriverServiceName,
     _In_ ULONG Tag,
     _In_ PUNICODE_STRING ImageName);

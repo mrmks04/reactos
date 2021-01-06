@@ -27,15 +27,16 @@ extern "C" {
 
 typedef VOID (*WDFFUNC) (VOID);
 
-const WDFFUNC *WdfFunctions_01017 = (WDFFUNC *)(&WdfVersion.Functions);
+// const WDFFUNC *WdfFunctions_01017 = (WDFFUNC *)(&WdfVersion.Functions);
 // DECLSPEC_ALIGN(MAX_NATURAL_ALIGNMENT) UINT8 WdfDriverGlobalsVal[248] = { 0 }; // sizeof(FX_DRIVER_GLOBALS)
 // PWDF_DRIVER_GLOBALS WdfDriverGlobals = &((PFX_DRIVER_GLOBALS)&WdfDriverGlobalsVal)->Public;
-WDF_BIND_INFO WdfBindInfo = {0};
+// WDF_BIND_INFO WdfBindInfo = {0};
 PWDF_DRIVER_GLOBALS WdfDriverGlobals;
+// WDFFUNC *WdfFunctions_01017;
 
 #define  KMDF_DEFAULT_NAME   "Wdf01000"
 
-PCHAR WdfLdrType = KMDF_DEFAULT_NAME;
+// PCHAR WdfLdrType = KMDF_DEFAULT_NAME;
 
 WDFAPI
 NTSTATUS
@@ -48,20 +49,20 @@ WdfApiNotImplemented()
 }
 
 // called in WdfDriverCreate in fxdriverapi.cpp
-VOID
-RosInitWdf()
-{
-	WdfDriverGlobals = FxAllocateDriverGlobals();
-	PFX_DRIVER_GLOBALS fxDriverGlobals = GetFxDriverGlobals(WdfDriverGlobals);
+// VOID
+// RosInitWdf()
+// {
+// 	WdfDriverGlobals = FxAllocateDriverGlobals();
+// 	PFX_DRIVER_GLOBALS fxDriverGlobals = GetFxDriverGlobals(WdfDriverGlobals);
 
-	WdfBindInfo.Size = sizeof(WDF_BIND_INFO);
-	WdfBindInfo.Version.Major = 1;
-	WdfBindInfo.Version.Minor = 9;
-	WdfBindInfo.Version.Build = 7600;
-	WdfBindInfo.FuncCount = WdfVersion.FuncCount;
-	WdfBindInfo.FuncTable = (WDFFUNC *)(&WdfVersion.Functions);
-	fxDriverGlobals->WdfBindInfo = &WdfBindInfo;
-}
+// 	WdfBindInfo.Size = sizeof(WDF_BIND_INFO);
+// 	WdfBindInfo.Version.Major = 1;
+// 	WdfBindInfo.Version.Minor = 9;
+// 	WdfBindInfo.Version.Build = 7600;
+// 	WdfBindInfo.FuncCount = WdfVersion.FuncCount;
+// 	WdfBindInfo.FuncTable = (WDFFUNC *)(&WdfVersion.Functions);
+// 	fxDriverGlobals->WdfBindInfo = &WdfBindInfo;
+// }
 
 void
 __cxa_pure_virtual()

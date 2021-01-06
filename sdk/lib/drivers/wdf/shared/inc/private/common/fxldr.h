@@ -83,7 +83,7 @@ NTSTATUS
 typedef
 _Must_inspect_result_
 NTSTATUS
-(*PWDF_REGISTER_LIBRARY)(
+(STDCALL *PWDF_REGISTER_LIBRARY)(
     __in  PWDF_LIBRARY_INFO   LibraryInfo,
     __in  PUNICODE_STRING     ServicePath,
     __in  PCUNICODE_STRING    LibraryDeviceName
@@ -92,7 +92,7 @@ NTSTATUS
 typedef
 _Must_inspect_result_
 NTSTATUS
-(*PWDF_VERSION_BIND)(
+(STDCALL *PWDF_VERSION_BIND)(
     __in  PDRIVER_OBJECT           DriverObject,
     __in  PUNICODE_STRING          RegistryPath,
     __in  PWDF_BIND_INFO           Info,
@@ -101,7 +101,7 @@ NTSTATUS
 
 typedef
 NTSTATUS
-(*PWDF_VERSION_UNBIND)(
+(STDCALL *PWDF_VERSION_UNBIND)(
     __in PUNICODE_STRING         RegistryPath,
     __in PWDF_BIND_INFO          Info,
     __in PWDF_COMPONENT_GLOBALS  Globals
@@ -118,44 +118,44 @@ NTSTATUS
 //
 // Version container
 //
-typedef struct _WDF_VERSION {
-    WDF_MAJOR_VERSION  Major;
-    WDF_MINOR_VERSION  Minor;
-    WDF_BUILD_NUMBER   Build;
-} WDF_VERSION;
+// typedef struct _WDF_VERSION {
+//     WDF_MAJOR_VERSION  Major;
+//     WDF_MINOR_VERSION  Minor;
+//     WDF_BUILD_NUMBER   Build;
+// } WDF_VERSION;
 
 //
 // WDF bind information structure.
 //
-typedef struct _WDF_BIND_INFO {
-    ULONG              Size;
-    PWCHAR             Component;
-    WDF_VERSION        Version;
-    ULONG              FuncCount;
-    __field_bcount(FuncCount*sizeof(WDFFUNC)) WDFFUNC* FuncTable;
-    PLIBRARY_MODULE    Module;     // Mgmt and diagnostic use only
-} WDF_BIND_INFO, * PWDF_BIND_INFO;
+// typedef struct _WDF_BIND_INFO {
+//     ULONG              Size;
+//     PWCHAR             Component;
+//     WDF_VERSION        Version;
+//     ULONG              FuncCount;
+//     __field_bcount(FuncCount*sizeof(WDFFUNC)) WDFFUNC* FuncTable;
+//     PLIBRARY_MODULE    Module;     // Mgmt and diagnostic use only
+// } WDF_BIND_INFO, * PWDF_BIND_INFO;
 
-typedef struct _WDF_LIBRARY_INFO {
-    ULONG                             Size;
-    PFNLIBRARYCOMMISSION              LibraryCommission;
-    PFNLIBRARYDECOMMISSION            LibraryDecommission;
-    PFNLIBRARYREGISTERCLIENT          LibraryRegisterClient;
-    PFNLIBRARYUNREGISTERCLIENT        LibraryUnregisterClient;
-    WDF_VERSION                       Version;
-} WDF_LIBRARY_INFO, *PWDF_LIBRARY_INFO;
+// typedef struct _WDF_LIBRARY_INFO {
+//     ULONG                             Size;
+//     PFNLIBRARYCOMMISSION              LibraryCommission;
+//     PFNLIBRARYDECOMMISSION            LibraryDecommission;
+//     PFNLIBRARYREGISTERCLIENT          LibraryRegisterClient;
+//     PFNLIBRARYUNREGISTERCLIENT        LibraryUnregisterClient;
+//     WDF_VERSION                       Version;
+// } WDF_LIBRARY_INFO, *PWDF_LIBRARY_INFO;
 
 // {49215DFF-F5AC-4901-8588-AB3D540F6021}
 DEFINE_GUID(GUID_WDF_LOADER_INTERFACE_STANDARD, \
              0x49215dff, 0xf5ac, 0x4901, 0x85, 0x88, 0xab, 0x3d, 0x54, 0xf, 0x60, 0x21);
 
-typedef struct _WDF_LOADER_INTERFACE {
-    WDF_INTERFACE_HEADER        Header;
-    PWDF_REGISTER_LIBRARY       RegisterLibrary;
-    PWDF_VERSION_BIND           VersionBind;
-    PWDF_VERSION_UNBIND         VersionUnbind;
-    PWDF_LDR_DIAGNOSTICS_VALUE_BY_NAME_AS_ULONG DiagnosticsValueByNameAsULONG;
-} WDF_LOADER_INTERFACE,  *PWDF_LOADER_INTERFACE;
+// typedef struct _WDF_LOADER_INTERFACE {
+//     WDF_INTERFACE_HEADER        Header;
+//     PWDF_REGISTER_LIBRARY       RegisterLibrary;
+//     PWDF_VERSION_BIND           VersionBind;
+//     PWDF_VERSION_UNBIND         VersionUnbind;
+//     PWDF_LDR_DIAGNOSTICS_VALUE_BY_NAME_AS_ULONG DiagnosticsValueByNameAsULONG;
+// } WDF_LOADER_INTERFACE,  *PWDF_LOADER_INTERFACE;
 
 VOID
 __inline
@@ -174,24 +174,25 @@ WDF_LOADER_INTERFACE_INIT(
 // library that is not already present in WDF_BIND_INFO (also passed to library
 // during client registration)
 //
-typedef struct _CLIENT_INFO {
-    //
-    // Size of this structure
-    //
-    ULONG              Size;
+// typedef struct _CLIENT_INFO {
+//     //
+//     // Size of this structure
+//     //
+//     ULONG              Size;
 
-    //
-    // registry service path of client driver
-    //
-    PUNICODE_STRING    RegistryPath;
+//     //
+//     // registry service path of client driver
+//     //
+//     PUNICODE_STRING    RegistryPath;
 
-} CLIENT_INFO, *PCLIENT_INFO;
+// } CLIENT_INFO, *PCLIENT_INFO;
 
 //-----------------------------------------------------------------------------
 // WDFLDR.SYS exported function prototype definitions
 //-----------------------------------------------------------------------------
 _Must_inspect_result_
 NTSTATUS
+NTAPI
 WdfVersionBind(
     __in    PDRIVER_OBJECT DriverObject,
     __in    PUNICODE_STRING RegistryPath,
@@ -200,6 +201,7 @@ WdfVersionBind(
     );
 
 NTSTATUS
+NTAPI
 WdfVersionUnbind(
     __in PUNICODE_STRING RegistryPath,
     __in PWDF_BIND_INFO BindInfo,
@@ -208,18 +210,19 @@ WdfVersionUnbind(
 
 _Must_inspect_result_
 NTSTATUS
+NTAPI
 WdfRegisterLibrary(
     __in PWDF_LIBRARY_INFO LibraryInfo,
     __in PUNICODE_STRING ServicePath,
     __in PCUNICODE_STRING LibraryDeviceName
     );
 
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text (PAGE, WdfVersionBind)
-#pragma alloc_text (PAGE, WdfVersionUnbind)
-#pragma alloc_text (PAGE, WdfRegisterLibrary)
-// #pragma alloc_text (PAGE, WdfRegisterClassLibrary)
-#endif
+// #ifdef ALLOC_PRAGMA
+// #pragma alloc_text (PAGE, WdfVersionBind)
+// #pragma alloc_text (PAGE, WdfVersionUnbind)
+// #pragma alloc_text (PAGE, WdfRegisterLibrary)
+// // #pragma alloc_text (PAGE, WdfRegisterClassLibrary)
+// #endif
 
 #ifdef __cplusplus
 } // extern "C"

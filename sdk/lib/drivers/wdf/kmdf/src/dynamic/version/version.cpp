@@ -31,7 +31,7 @@ extern "C" {
 
 #include <fxldr.h>
 #include "fxbugcheck.h"
-#include "wdfversionlog.h"
+// #include "wdfversionlog.h"
 
 #define DRIVER_OBJECT_EXTENSION_IDENTIFIER      DriverEntry
 #define DRIVER_PARAMETERS L"Parameters"
@@ -188,6 +188,7 @@ WDF_LIBRARY_INFO  WdfLibraryInfo = {
 
 extern "C"
 NTSTATUS
+STDCALL
 FxLibraryDispatch (
     __in struct _DEVICE_OBJECT * DeviceObject,
     __in PIRP Irp
@@ -302,6 +303,7 @@ FxLibraryCleanup(
 
 extern "C"
 NTSTATUS
+STDCALL
 DriverEntry(
     __in PDRIVER_OBJECT   DriverObject,
     __in PUNICODE_STRING  RegistryPath
@@ -328,7 +330,7 @@ DriverEntry(
     // Initialize global to make NonPagedPool be treated as NxPool on Win8
     // and NonPagedPool on down-level
     //
-    ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
+    // ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
 
     RtlInitUnicodeString(&string, WDF_REGISTRY_DBGPRINT_ON);
 
@@ -391,6 +393,7 @@ DriverEntry(
 //-----------------------------------------------------------------------------
 extern "C"
 VOID
+STDCALL
 DriverUnload(
     __in PDRIVER_OBJECT   DriverObject
     )
@@ -485,7 +488,7 @@ WDF_LIBRARY_REGISTER_CLIENT(
         rawData[3] = WdfLibraryInfo.Version.Minor;
 
         LibraryLogEvent(FxLibraryGlobals.DriverObject,
-                       WDFVER_MINOR_VERSION_NOT_SUPPORTED,
+                       0xdeadbeef, //WDFVER_MINOR_VERSION_NOT_SUPPORTED,
                        STATUS_OBJECT_TYPE_MISMATCH,
                        insertString,
                        rawData,

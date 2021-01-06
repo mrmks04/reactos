@@ -97,7 +97,7 @@ LibraryCreate(
         goto clean;
     }
     
-    status = GetImageName(DriverServiceName, WDFLDR_TAG, &pLibModule->ImageName);
+    status = GetImageName2(DriverServiceName, WDFLDR_TAG, &pLibModule->ImageName);
     if (!NT_SUCCESS(status))
     {
         goto clean;
@@ -299,7 +299,7 @@ LibraryLinkInClient(
     InitializeListHead(&pClientModule->LibListEntry);
     pClientModule->Context = Context;
     pClientModule->Info = BindInfo;
-    status = GetImageName(DriverServiceName, WDFLDR_TAG, &pClientModule->ImageName);
+    status = GetImageName2(DriverServiceName, WDFLDR_TAG, &pClientModule->ImageName);
 
     if (NT_SUCCESS(status))
     {

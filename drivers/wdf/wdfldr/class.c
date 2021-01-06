@@ -152,7 +152,7 @@ ClassCreate(
     pNewClassModule->Service.MaximumLength = ServiceName->MaximumLength;
     RtlZeroMemory(pNewClassModule->Service.Buffer, pNewClassModule->Service.MaximumLength);
     RtlCopyUnicodeString(&pNewClassModule->Service, ServiceName);
-    status = GetImageName(ServiceName, WDFLDR_TAG, &pNewClassModule->ImageName);
+    status = GetImageName2(ServiceName, WDFLDR_TAG, &pNewClassModule->ImageName);
 
     if (!NT_SUCCESS(status))
     {

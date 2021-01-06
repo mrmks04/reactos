@@ -18,8 +18,10 @@ extern RTL_OSVERSIONINFOW  gOsVersion;
 #define _LIT_(a)    # a
 #define LITERAL(a) _LIT_(a)
 
+#ifndef __PrintUnfiltered
 #define __PrintUnfiltered(...)          \
     DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_ERROR_LEVEL, __VA_ARGS__);
+#endif
 
 #define __Print(_x_)                                                           \
 {                                                                              \

@@ -82,7 +82,7 @@ end:
 
 NTSTATUS
 NTAPI
-GetImageName(
+GetImageName2(
     _In_ PUNICODE_STRING DriverServiceName,
     _In_ ULONG Tag,
     _In_ PUNICODE_STRING ImageName)
