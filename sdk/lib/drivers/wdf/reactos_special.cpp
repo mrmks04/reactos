@@ -9,9 +9,11 @@ extern "C" {
 #include <ntstrsafe.h>
 }
 
+#include <wdf.h>
+
 #define  FX_DYNAMICS_GENERATE_TABLE   1
 
-#include "fx.hpp"
+//#include "fx.hpp"
 
 // #include <fxldr.h>
 // #include "fxbugcheck.h"
@@ -21,7 +23,7 @@ extern "C" {
 
 extern "C" {
 
-#include "fxdynamics.h"
+//#include "fxdynamics.h"
 
 // #include "FxLibraryCommon.h"
 
@@ -31,7 +33,7 @@ typedef VOID (*WDFFUNC) (VOID);
 // DECLSPEC_ALIGN(MAX_NATURAL_ALIGNMENT) UINT8 WdfDriverGlobalsVal[248] = { 0 }; // sizeof(FX_DRIVER_GLOBALS)
 // PWDF_DRIVER_GLOBALS WdfDriverGlobals = &((PFX_DRIVER_GLOBALS)&WdfDriverGlobalsVal)->Public;
 // WDF_BIND_INFO WdfBindInfo = {0};
-PWDF_DRIVER_GLOBALS WdfDriverGlobals;
+//PWDF_DRIVER_GLOBALS WdfDriverGlobals;
 // WDFFUNC *WdfFunctions_01017;
 
 #define  KMDF_DEFAULT_NAME   "Wdf01000"

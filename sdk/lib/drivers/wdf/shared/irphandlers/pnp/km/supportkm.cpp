@@ -200,11 +200,11 @@ Return value:
     Pointer to the object that can be passed in to IoAllocateWorkItem
 --*/
 {
-    // return (PVOID) FxLibraryGlobals.DriverObject;
+    return (PVOID) FxLibraryGlobals.DriverObject;
     // __REACTOS__ : we don't have a WDF driver object here, use a child one
 
-    PFX_DRIVER_GLOBALS fxDriverGlobals = GetFxDriverGlobals(WdfDriverGlobals);
-    return fxDriverGlobals->Driver->GetDriverObject();
+    //PFX_DRIVER_GLOBALS fxDriverGlobals = GetFxDriverGlobals(WdfDriverGlobals);
+    //return fxDriverGlobals->Driver->GetDriverObject();
 }
 
 BOOLEAN

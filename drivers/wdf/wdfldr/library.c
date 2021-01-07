@@ -8,6 +8,7 @@
 
 #include "library.h"
 #include "ntddk_ex.h"
+#include "globals.h"
 
 #include <ntintsafe.h>
 #include <ntstrsafe.h>

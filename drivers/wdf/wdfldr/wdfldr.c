@@ -10,6 +10,7 @@
 #include "ntddk_ex.h"
 #include "library.h"
 #include "class.h"
+#include "globals.h"
 
 #include <ntintsafe.h>
 #include <ntstrsafe.h>
@@ -26,6 +27,13 @@ DEFINE_GUID(GUID_WDF_LOADER_INTERFACE_CLASS_BIND, 0xFA4838CB, 0x1D08, 0x41E1, 0x
 BOOLEAN gFlagInit;
 BOOLEAN gUnloaded;
 OSVERSIONINFOW gOsVersionInfoW;
+
+BOOLEAN WdfLdrDiags;
+LONG gKlibInitialized;
+ERESOURCE Resource;
+LIST_ENTRY gLibList;
+//typedef int (NTAPI* PRtlQueryModuleInformation)(PULONG, ULONG, PVOID);
+PRtlQueryModuleInformation pfnRtlQueryModuleInformation;
 //===== Global vars =====//
 
 // #ifdef ALLOC_PRAGMA
@@ -156,6 +164,7 @@ DllInitialize(
     NTSTATUS status;
     UNICODE_STRING csdVersion = RTL_CONSTANT_STRING(L"DbgPrintOn");
     ULONG ldrDiagnostic;
+    gKlibInitialized = 0;
 
     UNREFERENCED_PARAMETER(RegistryPath);
         

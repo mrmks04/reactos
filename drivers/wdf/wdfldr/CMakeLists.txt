@@ -9,7 +9,8 @@ list(APPEND SOURCE
    library.h
    class.h
    common.h
-   ntddk_ex.h)
+   ntddk_ex.h
+   globals.h)
 
 add_library(wdfldr MODULE
     ${SOURCE}

@@ -14,13 +14,8 @@
 typedef struct _WDF_BIND_INFO* PWDF_BIND_INFO;
 typedef struct _WDF_CLASS_BIND_INFO* PWDF_CLASS_BIND_INFO;
 typedef PVOID WDF_COMPONENT_GLOBALS, *PWDF_COMPONENT_GLOBALS;
-
-BOOLEAN WdfLdrDiags;
-LONG gKlibInitialized;
-ERESOURCE Resource;
-LIST_ENTRY gLibList;
 typedef int (NTAPI* PRtlQueryModuleInformation)(PULONG, ULONG, PVOID);
-PRtlQueryModuleInformation pfnRtlQueryModuleInformation;
+
 
 #define WDFLDR_TAG 'LfdW'
 

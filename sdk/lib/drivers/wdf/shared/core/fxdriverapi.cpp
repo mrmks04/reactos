@@ -104,7 +104,7 @@ WDFEXPORT(WdfDriverCreate)(
                             WdfDriverInitNoDispatchOverride;
 
     // RosInitWdf();
-    DriverGlobals = WdfDriverGlobals;
+    //DriverGlobals = WdfDriverGlobals;
 
     hDriver = NULL;
     pFxDriverGlobals = GetFxDriverGlobals(DriverGlobals);
