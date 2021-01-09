@@ -852,20 +852,18 @@ WdfVersionBind(
     _Out_ PWDF_COMPONENT_GLOBALS *ComponentGlobals)
 {
     NTSTATUS status;
-    PLIBRARY_MODULE pLibModule;
+    PLIBRARY_MODULE pLibModule = NULL;
     CLIENT_INFO clientInfo;
-    PCLIENT_INFO pclientInfo;
-    PCLIENT_MODULE  pClientModule;
+    PCLIENT_INFO pclientInfo = NULL;
+    PCLIENT_MODULE  pClientModule = NULL;
 
     UNREFERENCED_PARAMETER(DriverObject);
     PAGED_CODE();
 
-    pLibModule = NULL;
-    clientInfo.Size = 8;
+    clientInfo.Size = sizeof(CLIENT_INFO);
 
     __DBGPRINT(("enter"));
 
-    pClientModule = NULL;
     if (ComponentGlobals == NULL ||
         BindInfo == NULL ||
         BindInfo->FuncTable == NULL)
