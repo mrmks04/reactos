@@ -1054,7 +1054,7 @@ FxAllocateDriverGlobals(
     )
 {
     PFX_DRIVER_GLOBALS  pFxDriverGlobals;
-    // KIRQL               irql;
+    KIRQL               irql;
     NTSTATUS            status;
 
     pFxDriverGlobals = (PFX_DRIVER_GLOBALS)
@@ -1081,12 +1081,10 @@ FxAllocateDriverGlobals(
     //
     // Initialize this new FxDriverGlobals structure.
     //
-#ifndef __REACTOS__
     FxLibraryGlobals.FxDriverGlobalsListLock.Acquire(&irql);
     InsertHeadList(&FxLibraryGlobals.FxDriverGlobalsList,
                    &pFxDriverGlobals->Linkage);
     FxLibraryGlobals.FxDriverGlobalsListLock.Release(irql);
-#endif
 
     pFxDriverGlobals->WdfHandleMask                  = FxHandleValueMask;
     pFxDriverGlobals->WdfVerifierAllocateFailCount   = (ULONG) -1;
