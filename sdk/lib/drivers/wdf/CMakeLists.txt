@@ -186,7 +186,7 @@ endif()
 
 set_module_type(wdf01000 kernelmodedriver)
 add_importlibs(wdf01000 wdfldr ntoskrnl hal)
-add_cd_file(TARGET wdf01000 DESTINATION reactos/system32/drivers FOR all)
+add_cd_file(TARGET wdf01000 DESTINATION reactos/system32/drivers NO_CAB FOR all)
 add_registry_inf(wdf01000_reg.inf)
 
 target_compile_definitions(wdf01000
