@@ -22,14 +22,8 @@ HvpWriteLog(
     ULONG LastIndex;
     PVOID BlockPtr;
     BOOLEAN Success;
-    static ULONG PrintCount = 0;
 
-    if (PrintCount++ == 0)
-    {
-        UNIMPLEMENTED;
-    }
-    return TRUE;
-
+    
     ASSERT(RegistryHive->ReadOnly == FALSE);
     ASSERT(RegistryHive->BaseBlock->Length ==
            RegistryHive->Storage[Stable].Length * HBLOCK_SIZE);
@@ -42,17 +36,15 @@ HvpWriteLog(
         return FALSE;
     }
 
-    BitmapSize = RegistryHive->DirtyVector.SizeOfBitMap;
-    BufferSize = HV_LOG_HEADER_SIZE + sizeof(ULONG) + BitmapSize;
-    BufferSize = ROUND_UP(BufferSize, HBLOCK_SIZE);
-
-    DPRINT("Bitmap size %u  buffer size: %u\n", BitmapSize, BufferSize);
-
-    Buffer = RegistryHive->Allocate(BufferSize, TRUE, TAG_CM);
+    BitmapSize = ROUND_UP(sizeof(ULONG) + RegistryHive->DirtyVector.SizeOfBitMap, HSECTOR_SIZE);
+    BufferSize = HV_LOG_HEADER_SIZE + BitmapSize;
+    Buffer = RegistryHive->Allocate(BufferSize, TRUE, TAG_CM);    
     if (Buffer == NULL)
     {
         return FALSE;
     }
+
+    RtlZeroMemory(Buffer, BufferSize);
 
     /* Update first update counter and CheckSum */
     RegistryHive->BaseBlock->Type = HFILE_TYPE_LOG;
@@ -65,7 +57,21 @@ HvpWriteLog(
     Ptr = Buffer + HV_LOG_HEADER_SIZE;
     RtlCopyMemory(Ptr, "DIRT", 4);
     Ptr += 4;
-    RtlCopyMemory(Ptr, RegistryHive->DirtyVector.Buffer, BitmapSize);
+
+    // Mark dirty blocks as "FF" - 1 bit per sector
+    BlockIndex = 0;
+    while (BlockIndex < RegistryHive->Storage[Stable].Length)
+    {
+        LastIndex = BlockIndex;
+        BlockIndex = RtlFindSetBits(&RegistryHive->DirtyVector, 1, BlockIndex);
+        if (BlockIndex == ~0U || BlockIndex < LastIndex)
+        {
+            break;
+        }
+
+        Ptr[BlockIndex] = 0xFF;
+        BlockIndex++;
+    }
 
     /* Write hive block and block bitmap */
     FileOffset = 0;
