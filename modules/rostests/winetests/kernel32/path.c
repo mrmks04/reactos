@@ -1935,11 +1935,15 @@ static void test_SearchPathW(void)
     static const WCHAR extW[] = {'.','e','x','t',0};
     static const WCHAR dllW[] = {'.','d','l','l',0};
     static const WCHAR fileW[] = { 0 };
+    static const WCHAR* longDirName =  L"C:\\Program Files\\Very_long_test_path_which_can_trigger_heap_overflow_test_1234567890______________________________________________________AB";
+    static const WCHAR* longFileName = L"this_is_long_file_name_for_checking______________________________________________________________________________CD";
+    static const WCHAR* ext = L".txt";
+
     WCHAR pathW[MAX_PATH], buffW[MAX_PATH], path2W[MAX_PATH];
     WCHAR *ptrW = NULL;
     ULONG_PTR cookie;
     HANDLE handle;
-    DWORD ret;
+    DWORD ret, len;
 
     if (!pSearchPathW)
     {
@@ -2022,6 +2026,19 @@ if (0)
     ret = pDeactivateActCtx(0, cookie);
     ok(ret, "failed to deactivate context, %u\n", GetLastError());
     pReleaseActCtx(handle);
+
+    /*
+       Test buffer overflow.
+       lenof(longDirName) + lenof(longFileName) + lenof(ext) = MAX_PATH
+    */
+    len = pSearchPathW(longDirName,
+                       longFileName,
+                       ext,
+                       sizeof(pathW),
+                       pathW,
+                       NULL);
+    ret = GetLastError();
+    ok(ret == ERROR_FILE_NOT_FOUND, "ret value: %u\n", ret);
 }
 
 static void test_GetFullPathNameA(void)
